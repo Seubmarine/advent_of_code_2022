@@ -1,3 +1,5 @@
+mod day2;
+
 use std::{fs::File, io::{BufRead, BufReader}, process::exit};
 
 #[derive(Default)]
@@ -5,7 +7,7 @@ struct Inventory {
     calories : u64
 }
 
-fn main() {
+fn day1() {
     let filepath = match std::env::args().nth(1) {
         Some(value) => value,
         None => "input_day1.txt".to_string(),
@@ -41,4 +43,9 @@ fn main() {
     if inventories.len() >= 3 {
         println!("Solution 2 {}", inventories[0].calories + inventories[1].calories + inventories[2].calories);
     }
+}
+
+fn main() {
+    // day1();
+    crate::day2::day2();
 }
