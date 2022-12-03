@@ -1,28 +1,45 @@
 use std::{io::{BufRead, BufReader}, str::FromStr};
 
-#[derive(PartialEq, Eq)]
+#[derive(PartialEq, Eq, Clone, Copy)]
 enum Shape {
 	Rock = 1,
 	Paper = 2,
 	Scisor = 3
 }
 
-trait Score {
-	fn score(&self) -> u32;
-}
-
-impl Score for Shape {
-    fn score(&self) -> u32 {
+impl Shape {
+    fn shape_score(&self) -> u32 {
         match self {
             Shape::Rock => 1,
             Shape::Paper => 2,
             Shape::Scisor => 3,
         }
     }
-}
 
-trait ShapeLoose {
-	
+	fn lose_against(&self) -> Shape {
+		match self {
+			Shape::Rock => Shape::Paper,
+            Shape::Paper => Shape::Scisor,
+            Shape::Scisor => Shape::Rock
+		}
+	}
+
+	fn win_agaist(&self) -> Shape {
+		match self {
+			Shape::Rock => Shape::Scisor,
+            Shape::Paper => Shape::Rock,
+            Shape::Scisor => Shape::Paper
+		}
+	}
+
+	fn score_against(&self, other : &Self) -> u32
+	{
+		match self.partial_cmp(&other).unwrap() {
+			Ordering::Less => 0,
+			Ordering::Equal => 3,
+			Ordering::Greater => 6,
+		}
+	}
 }
 
 impl FromStr for Shape {
@@ -56,6 +73,25 @@ impl PartialOrd for Shape {
     }
 }
 
+enum Goal {
+	Loss,
+	Draw,
+	Win
+}
+
+impl FromStr for Goal {
+	type Err = &'static str;
+
+	fn from_str(s: &str) -> Result<Self, Self::Err> {
+		match s {
+			"X" => Ok(Self::Loss),
+			"Y" => Ok(Self::Draw),
+			"Z" => Ok(Self::Win),
+			_ => Err("Invalid goal argument")
+		}
+	}
+}
+
 pub fn day2() {
 	let filepath = match std::env::args().nth(1) {
         Some(value) => value,
@@ -68,23 +104,27 @@ pub fn day2() {
     }
     let lines = BufReader::new(file).lines();
     
-	let mut score = 0;
+	let mut score_1 = 0;
+	let mut score_2 = 0;
 	for line in lines {
 		match line {
 			Err(e) => {eprintln!("{e}"); return;},
 			Ok(line) => {
-				let (opponent, player) = line.split_once(' ').expect("Line couldn't be split in two");
-				let opponent = opponent.parse::<Shape>().expect("Invalid Shape for the opponent");
-				let player = player.parse::<Shape>().expect("Invalid Shape for the player");
+				let (opponent_str, player_str) = line.split_once(' ').expect("Line couldn't be split in two");
+				let opponent = opponent_str.parse::<Shape>().expect("Invalid Shape for the opponent");
+				let mut player = player_str.parse::<Shape>().expect("Invalid Shape for the player");
 				
-				let battle_score =  match player.partial_cmp(&opponent).unwrap() {
-					Ordering::Less => 0,
-					Ordering::Equal => 3,
-					Ordering::Greater => 6,
-				};
-				score += battle_score + player.score();
+				score_1 += player.score_against(&opponent) + player.shape_score();
+				let goal = player_str.parse::<Goal>().unwrap();
+				match goal {
+					Goal::Draw => player = opponent,
+					Goal::Win => player = opponent.lose_against(),
+					Goal::Loss => player = opponent.win_agaist(),
+				}
+				score_2 += player.score_against(&opponent) + player.shape_score();
 			}
-		} 
+		}
 	}
-	println!("Solution 1: {score}");
+	println!("Solution 1: {score_1}");
+	println!("Solution 2: {score_2}");
 }
