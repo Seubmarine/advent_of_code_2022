@@ -1,3 +1,5 @@
+#![feature(iter_array_chunks)]
+
 pub mod day3;
 
 use std::{io::{Lines, BufReader, BufRead}, fs::File};
