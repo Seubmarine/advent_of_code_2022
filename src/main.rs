@@ -1,51 +1,17 @@
-mod day2;
+pub mod day3;
 
-use std::{fs::File, io::{BufRead, BufReader}, process::exit};
+use std::{io::{Lines, BufReader, BufRead}, fs::File};
 
-#[derive(Default)]
-struct Inventory {
-    calories : u64
-}
-
-fn day1() {
-    let filepath = match std::env::args().nth(1) {
-        Some(value) => value,
-        None => "input_day1.txt".to_string(),
-    };
+fn file_lines_iter(filename : &str) -> Lines<BufReader<File>>{
+    
     let file;
-    match File::open(&filepath) {
+    match File::open(&filename) {
         Ok(value) => file = value,
-        Err(e) => {eprintln!("\"{filepath}\": {e}"); exit(2)},
+        Err(e) => panic!("{e}"),
     }
-    let lines = BufReader::new(file).lines();
-    
-    let mut current = Inventory::default();
-    let mut inventories : Vec<Inventory> = Vec::new();
-    
-    for line_r in lines {
-        if let Ok(line) = line_r {
-            if line.is_empty() {
-                inventories.push(current);
-                current = Inventory::default();
-            }
-            else {
-                current.calories += line.parse::<u64>().unwrap();                
-            }
-        } else {
-            panic!("Error reading line")
-        }
-    }
-    inventories.sort_by_key(|k| std::cmp::Reverse(k.calories));    
-    
-    if !inventories.is_empty() {
-        println!("Solution 1 {}", inventories[0].calories);
-    }
-    if inventories.len() >= 3 {
-        println!("Solution 2 {}", inventories[0].calories + inventories[1].calories + inventories[2].calories);
-    }
+    BufReader::new(file).lines()
 }
 
 fn main() {
-    // day1();
-    crate::day2::day2();
+    crate::day3::day3("input_day3.txt");
 }
