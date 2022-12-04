@@ -1,6 +1,6 @@
 #![feature(iter_array_chunks)]
 
-pub mod day3;
+pub mod day4;
 
 use std::{io::{Lines, BufReader, BufRead}, fs::File};
 
@@ -15,5 +15,5 @@ fn file_lines_iter(filename : &str) -> Lines<BufReader<File>>{
 }
 
 fn main() {
-    crate::day3::day3("input_day3.txt");
+    crate::day4::day4("input_day4.txt");
 }
