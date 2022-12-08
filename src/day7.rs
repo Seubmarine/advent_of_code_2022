@@ -1,5 +1,7 @@
 use std::fmt::Display;
 
+use itertools::Itertools;
+
 trait DisplayDepth
 	where Self : std::fmt::Display
 {
@@ -213,9 +215,18 @@ pub fn day7(filename : &str) {
 	let system = FileSystem::Directory(root);
 	println!("{system}");
 
-	let i : usize = dirs_size.into_iter().filter(|x| x <= &100000).sum();
-	println!("{i}");
-	// for i in commands {
-	// 	println!("{i:?}");
+	let i : usize = dirs_size.clone().into_iter().filter(|x| x <= &100000).sum();
+	println!("Solution 1: {i}");
+	dirs_size.sort();
+	let space_used = dirs_size.last().unwrap();
+	const SPACE_TOTAL : usize = 70000000;
+	let space_needed : usize = SPACE_TOTAL - space_used;
+	println!("space_needed {space_needed}");
+	let need_to_free = 30000000 - space_needed;
+	println!("need_to_free {need_to_free}");
+	let dir_to_remove = dirs_size.into_iter().filter(|x| x > &need_to_free).next().unwrap();
+	// for i in dir_to_remove {
+	// 	println!("{i}");
 	// }
+	println!("Solution 2: {dir_to_remove}");
 }
